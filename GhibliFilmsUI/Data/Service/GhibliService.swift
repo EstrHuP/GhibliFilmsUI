@@ -7,4 +7,5 @@
 
 protocol GhibliService {
     func fetchFilms() async throws -> [Film]
+    func fetchPerson(from url: String) async throws -> Person
 }

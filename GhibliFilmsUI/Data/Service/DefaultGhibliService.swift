@@ -8,11 +8,11 @@
 import Foundation
 
 struct DefaultGhibliService: GhibliService {
-    func fetchFilms() async throws -> [Film] {
-        guard let url = URL(string: Constants.apiURL + Constants.apiFilmsEndpoint) else {
+    
+    func fetchData<T: Decodable>(from URLString: String, type: T.Type) async throws -> T {
+        guard let url = URL(string: URLString) else {
             throw APIState.APIError.invalidURL
         }
-        
         do {
             let (data, response) = try await URLSession.shared.data(from: url)
             guard let httpResponse = response as? HTTPURLResponse,
@@ -20,7 +20,7 @@ struct DefaultGhibliService: GhibliService {
             else {
                 throw APIState.APIError.invalidURL
             }
-            return try JSONDecoder().decode([Film].self, from: data)
+            return try JSONDecoder().decode(type, from: data)
         } catch let error as DecodingError {
             throw APIState.APIError.decoding(error)
         } catch let error as URLError {
@@ -28,5 +28,14 @@ struct DefaultGhibliService: GhibliService {
         } catch {
             throw error
         }
+    }
+    
+    func fetchFilms() async throws -> [Film] {
+        let urlString = Constants.apiURL + Constants.apiFilmsEndpoint
+        return try await fetchData(from: urlString, type: [Film].self)
+    }
+    
+    func fetchPerson(from url: String) async throws -> Person {
+        return try await fetchData(from: url, type: Person.self)
     }
 }

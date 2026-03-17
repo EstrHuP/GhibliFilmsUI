@@ -6,6 +6,10 @@
 //
 
 struct MockGhibliService: GhibliService {
+    func fetchPerson(from url: String) async throws -> Person {
+        <#code#>
+    }
+    
     func fetchFilms() async throws -> [Film] {
          return []
     }
